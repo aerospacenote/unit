@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>항공우주 단위 변환기</title>
+<meta name="theme-color" content="#0b1430">
+<meta name="description" content="에어로스페이스노트 항공우주 단위 변환기: 추력, 압력, 연료소모율, 비추력, 표준대기">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="단위변환기">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3f5fa; --panel:#ffffff; --panel2:#eef2fa; --ink:#0b1430; --ink2:#4a5677; --line:#d6dcea;
+  --gold:#c99500; --gold-bg:#fff4cc; --cyan:#007f95; --cyan-bg:#dff7fb; --orange:#d2651c; --accent:#0b1430; --accent-ink:#ffffff;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#070d22; --panel:#0e1838; --panel2:#132150; --ink:#eef2ff; --ink2:#9aa8cc; --line:#24345f;
+    --gold:#ffd447; --gold-bg:#3a3214; --cyan:#5ef0ff; --cyan-bg:#0f3a48; --orange:#ff8a3d; --accent:#ffd447; --accent-ink:#0b1430;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#070d22; --panel:#0e1838; --panel2:#132150; --ink:#eef2ff; --ink2:#9aa8cc; --line:#24345f;
+  --gold:#ffd447; --gold-bg:#3a3214; --cyan:#5ef0ff; --cyan-bg:#0f3a48; --orange:#ff8a3d; --accent:#ffd447; --accent-ink:#0b1430;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans KR",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:880px;margin:0 auto;padding:12px 16px 120px}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:18px}
+h1{margin:0;font-size:20px;font-weight:900;letter-spacing:-.5px}
+h1 span{color:var(--gold)}
+.sub{color:var(--ink2);font-size:12px;margin-top:4px}
+.brand{font-size:12px;color:var(--ink2);text-align:right;white-space:nowrap}
+.brand b{color:var(--cyan)}
+nav.tabs{display:flex;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:5px;margin-bottom:16px}
+nav.tabs button{flex:1;border:0;background:transparent;color:var(--ink2);font:700 13px "Noto Sans KR";padding:7px 6px;border-radius:10px;cursor:pointer}
+nav.tabs button.on{background:var(--accent);color:var(--accent-ink)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.chip{border:1px solid var(--line);background:var(--panel2);color:var(--ink);font:500 12px "Noto Sans KR";padding:5px 10px;border-radius:999px;cursor:pointer}
+.chip.on{border-color:var(--gold);background:var(--gold-bg);color:var(--ink);font-weight:700}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row > *{flex:1 1 200px}
+label{display:block;font-size:12px;color:var(--ink2);margin-bottom:6px;font-weight:500}
+input,select{width:100%;font:700 16px "JetBrains Mono",monospace;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:7px 10px;outline:none}
+select{font:500 14px/1.4 "Noto Sans KR";height:auto;min-height:40px;padding:8px 10px}
+input:focus,select:focus{border-color:var(--cyan)}
+.list{margin-top:12px;display:grid;gap:4px}
+.item{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:8px;padding:6px 10px;border-radius:9px;background:var(--panel2);border:1px solid transparent}
+.item.src{border-color:var(--gold)}
+.item .v{font:700 15px "JetBrains Mono",monospace;text-align:right;word-break:break-all}
+.item .u{font-size:12px;color:var(--ink2);min-width:0}
+.item .u b{color:var(--ink);font-weight:700;margin-right:6px}
+.copy{border:1px solid var(--line);background:transparent;color:var(--ink2);border-radius:8px;font:500 12px "Noto Sans KR";padding:5px 8px;cursor:pointer}
+.copy.ok{color:var(--cyan);border-color:var(--cyan)}
+.note{margin-top:12px;font-size:12px;color:var(--ink2);line-height:1.6;border-left:3px solid var(--cyan);padding-left:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:16px}
+.stat{background:var(--panel2);border-radius:10px;padding:9px 10px}
+.stat .k{font-size:11px;color:var(--ink2)}
+.stat .n{font:700 16px "JetBrains Mono",monospace;margin-top:4px}
+.stat .s{font-size:11px;color:var(--ink2);margin-top:2px;font-family:"JetBrains Mono",monospace}
+h2{font-size:15px;margin:0 0 10px;font-weight:900}
+h2 small{font-weight:500;color:var(--ink2);font-size:13px;margin-left:6px}
+.sec{margin-top:16px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:0;background:var(--panel2);color:var(--ink2);font:700 13px "Noto Sans KR";padding:6px 11px;cursor:pointer}
+.seg button.on{background:var(--cyan-bg);color:var(--cyan)}
+.hide{display:none}
+footer{margin-top:14px;font-size:11px;color:var(--ink2);line-height:1.7}
+.share{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.share b{font-size:14px}
+.btns{display:flex;gap:6px;flex-wrap:wrap}.yt{display:inline-block;background:#e1322f;color:#fff;text-decoration:none;font:700 12px "Noto Sans KR";padding:6px 12px;border-radius:999px}
+.brandlink{color:inherit;text-decoration:none}
+.themebtn{border:1px solid var(--line);background:var(--panel);color:var(--ink2);border-radius:8px;padding:4px 8px;font:500 12px "Noto Sans KR";cursor:pointer;margin-top:6px}
+@media (max-width:520px){h1{font-size:18px}.item{grid-template-columns:1fr auto;grid-template-areas:'u c' 'v v';row-gap:2px}.item .u{grid-area:u}.item .copy{grid-area:c}.item .v{grid-area:v;text-align:left}.stat .n{font-size:14px}.grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <h1>항공우주 <span>단위 변환기</span></h1>
+    <div class="sub">추력 · 압력 · 연료소모율 · 비추력 · 표준대기까지</div>
+  </div>
+  <div class="brand"><a class="brandlink" href="https://www.youtube.com/@AerospaceNote" target="_blank" rel="noopener">에어로스페이스노트<br><b>AEROSPACE NOTE</b></a><br><button class="themebtn" id="theme">테마 전환</button></div>
+</header>
+
+<nav class="tabs" role="tablist">
+  <button data-tab="conv" class="on">단위 변환</button>
+  <button data-tab="isa">표준대기 ISA</button>
+  <button data-tab="eng">엔진 지표</button>
+</nav>
+
+<section id="tab-conv" class="card">
+  <div class="chips" id="cats"></div>
+  <div class="row">
+    <div><label for="val">값</label><input id="val" inputmode="decimal" value="1"></div>
+    <div><label for="from">단위</label><select id="from"></select></div>
+  </div>
+  <div class="list" id="out"></div>
+  <div class="note" id="catnote"></div>
+</section>
+
+<section id="tab-isa" class="card hide">
+  <h2>국제표준대기 (ISA) <small>0 ~ 32 km</small></h2>
+  <div class="row">
+    <div><label for="alt">고도</label><input id="alt" inputmode="decimal" value="35000"></div>
+    <div><label>고도 단위</label><div class="seg" id="altu"><button data-u="ft" class="on">ft</button><button data-u="m">m</button><button data-u="FL">FL</button></div></div>
+    <div><label for="dt">ISA 편차 ΔT (°C)</label><input id="dt" inputmode="decimal" value="0"></div>
+  </div>
+  <div class="grid" id="isaout"></div>
+  <div class="sec">
+    <h2>마하수 ↔ 진대기속도 <small>위 고도 기준</small></h2>
+    <div class="row">
+      <div><label for="mach">마하수</label><input id="mach" inputmode="decimal" value="0.8"></div>
+      <div><label for="tas">진대기속도 TAS (kt)</label><input id="tas" inputmode="decimal"></div>
+    </div>
+    <div class="grid" id="machout"></div>
+  </div>
+  <div class="note">대류권(0~11 km) 기온감률 −6.5 K/km, 11~20 km 등온 216.65 K, 20~32 km +1 K/km. R = 287.053 J/(kg·K), γ = 1.4, g₀ = 9.80665 m/s². ΔT를 넣으면 같은 기압고도에서 온도만 바뀌고, 밀도와 음속이 그에 맞게 달라집니다.</div>
+</section>
+
+<section id="tab-eng" class="card hide">
+  <h2>연료소모율 TSFC ↔ 비추력 Isp</h2>
+  <div class="row">
+    <div><label for="tsfc">TSFC</label><input id="tsfc" inputmode="decimal" value="0.6"></div>
+    <div><label for="tsfcu">단위</label><select id="tsfcu"></select></div>
+  </div>
+  <div class="grid" id="engout"></div>
+  <div class="note">Isp(s) = 3600 ÷ TSFC[lb/(lbf·h)]. 가스터빈은 공기를 공짜로 쓰고 연료만 싣기 때문에 Isp가 수천 초, 로켓은 산화제까지 싣기 때문에 수백 초입니다. 로켓의 Isp는 추진제 전체 기준이고, 가스터빈은 연료만 기준이라는 점에 주의하세요.</div>
+  <div class="sec">
+    <h2>추력 대 중량비 · 추력 환산</h2>
+    <div class="row">
+      <div><label for="thr">추력 (lbf)</label><input id="thr" inputmode="decimal" value="10000"></div>
+      <div><label for="wt">무게 (kg)</label><input id="wt" inputmode="decimal" value="1000"></div>
+    </div>
+    <div class="grid" id="twout"></div>
+  </div>
+</section>
+
+<div class="card sec share">
+  <div><b>친구·동료와 공유하기</b><br><span class="sub">링크 하나로 휴대폰·PC 어디서나 열립니다. 설치는 필요 없습니다.</span></div>
+  <div class="btns"><button id="copylink" class="chip on">링크 복사</button><a class="yt" href="https://www.youtube.com/@AerospaceNote" target="_blank" rel="noopener">▶ 유튜브 채널</a></div>
+</div>
+<div class="note">📱 <b>앱처럼 쓰기:</b> 휴대폰 브라우저 메뉴에서 <b>‘홈 화면에 추가’</b>를 누르면 바탕화면 아이콘으로 바로 열 수 있습니다. (아이폰 Safari: 공유 버튼 → 홈 화면에 추가 / 안드로이드 Chrome: ⋮ → 홈 화면에 추가)</div>
+<footer>
+  환산 계수는 정의값 기준입니다: 1 lb = 0.45359237 kg, 1 ft = 0.3048 m, 1 kt = 1852 m/h, g₀ = 9.80665 m/s², 1 hp(영국 마력) = 745.70 W, 1 PS(미터 마력) = 735.50 W.<br>
+  참고용 계산기입니다. 설계·인증 문서에는 원 출처의 값을 확인해 쓰세요.<br>만든 곳: <a href="https://www.youtube.com/@AerospaceNote" target="_blank" rel="noopener" style="color:var(--cyan)">유튜브 에어로스페이스노트 (@AerospaceNote)</a> · 항공우주 기술 이야기를 쉽게 전합니다.
+</footer>
+</div>
+
+<script>
+const G0=9.80665, LB=0.45359237, LBF=LB*G0, FT=0.3048;
+// base units: N, W, Pa, m/s, m, kg, kg/s, kg/(N·s), m/s (Isp), kg/m3, J/kg, K
+const CATS={
+ thrust:{name:"추력·힘",units:[["N","뉴턴",1],["kN","킬로뉴턴",1e3],["daN","데카뉴턴",10],["lbf","파운드힘",LBF],["kgf","킬로그램힘",G0],["tf","톤힘",1000*G0],["klbf","천 파운드힘",1000*LBF]],
+  note:"1만 lbf ≈ 4.54 tf ≈ 44.5 kN. 로켓 추력은 보통 tf(톤힘)나 kN, 제트엔진은 lbf로 말합니다."},
+ power:{name:"동력",units:[["W","와트",1],["kW","킬로와트",1e3],["MW","메가와트",1e6],["hp","마력 (영국, shp)",745.69987158227],["PS","마력 (미터, PS)",735.49875],["BTU/s","BTU/초",1055.05585262],["ft·lbf/s","풋파운드/초",FT*LBF]],
+  note:"헬기·터보프롭 엔진의 '축마력(shp)'은 영국 마력(hp)과 같은 값입니다. 국내 자료의 '마력'은 PS인 경우가 있으니 확인하세요."},
+ pressure:{name:"압력",units:[["Pa","파스칼",1],["kPa","킬로파스칼",1e3],["MPa","메가파스칼",1e6],["bar","바",1e5],["atm","표준기압",101325],["psi","psi",LBF/(0.0254*0.0254)],["inHg","수은주 인치",3386.389],["mmHg","수은주 mm",133.322387415],["hPa","헥토파스칼 (mbar)",100],["kgf/cm²","킬로그램힘/cm²",G0*1e4]],
+  note:"고도계 설정은 inHg(미국) 또는 hPa(국제)를 씁니다. 엔진 압력비는 단위가 없는 비율이라 변환이 필요 없습니다."},
+ temp:{name:"온도",temp:true,units:[["K","켈빈"],["°C","섭씨"],["°F","화씨"],["°R","랭킨"]],
+  note:"터빈입구온도(TIT)는 보통 K나 °F로, 엔진 계기의 EGT는 °C로 표시합니다. 랭킨(°R)은 화씨 눈금의 절대온도입니다."},
+ speed:{name:"속도",units:[["m/s","미터/초",1],["km/h","킬로미터/시",1/3.6],["kt","노트",1852/3600],["mph","마일/시",0.44704],["ft/s","피트/초",FT],["ft/min","피트/분 (상승률)",FT/60]],
+  note:"마하수는 고도·기온에 따라 음속이 달라 고정 환산이 안 됩니다. '표준대기 ISA' 탭에서 고도를 넣고 계산하세요."},
+ length:{name:"길이·고도",units:[["m","미터",1],["km","킬로미터",1e3],["ft","피트",FT],["in","인치",0.0254],["nmi","해리",1852],["mi","마일",1609.344],["FL","비행고도 (100 ft)",100*FT]],
+  note:"FL350 = 35,000 ft ≈ 10.7 km. 해리(nmi)는 위도 1분에 해당하는 거리에서 왔습니다."},
+ mass:{name:"질량",units:[["kg","킬로그램",1],["g","그램",1e-3],["t","톤",1000],["lb","파운드",LB],["slug","슬러그",LBF/FT],["oz","온스",LB/16]],
+  note:"lb(질량)와 lbf(힘)는 다릅니다. 지표면에서 1 lb의 무게가 1 lbf입니다."},
+ mflow:{name:"질량유량",units:[["kg/s","킬로그램/초",1],["kg/h","킬로그램/시",1/3600],["lb/s","파운드/초",LB],["lb/h","파운드/시 (pph)",LB/3600],["lb/min","파운드/분",LB/60],["t/h","톤/시",1000/3600]],
+  note:"엔진 공기유량은 kg/s나 lb/s, 연료유량은 pph(lb/h)나 kg/h로 흔히 씁니다."},
+ tsfc:{name:"연료소모율",units:[["kg/(N·s)","SI",1],["g/(kN·s)","그램/(킬로뉴턴·초)",1e-6],["mg/(N·s)","밀리그램/(뉴턴·초)",1e-6],["lb/(lbf·h)","파운드/(파운드힘·시)",LB/(LBF*3600)],["kg/(kgf·h)","킬로그램/(킬로그램힘·시)",1/(G0*3600)],["kg/(daN·h)","킬로그램/(데카뉴턴·시)",1/(10*3600)]],
+  note:"lb/(lbf·h)와 kg/(kgf·h)는 숫자가 같습니다. 대형 터보팬 순항 TSFC는 대략 0.5~0.6 lb/(lbf·h) 수준입니다."},
+ isp:{name:"비추력",units:[["s","초 (Isp)",G0],["m/s","유효배기속도",1],["N·s/kg","뉴턴초/킬로그램",1],["lbf·s/lb","파운드힘초/파운드",G0]],
+  note:"Isp(초) × g₀ = 유효배기속도(m/s). 영국 단위의 lbf·s/lb는 초(s)와 같은 숫자입니다."},
+ density:{name:"밀도",units:[["kg/m³","킬로그램/m³",1],["g/cm³","그램/cm³",1000],["lb/ft³","파운드/ft³",LB/(FT**3)],["slug/ft³","슬러그/ft³",LBF/FT/(FT**3)],["lb/gal","파운드/갤런 (US)",LB/0.003785411784]],
+  note:"해면 표준 공기밀도 1.225 kg/m³. 제트연료(Jet A-1)는 약 0.80 kg/L, 6.7 lb/gal 수준입니다."},
+ energy:{name:"발열량",units:[["MJ/kg","메가줄/킬로그램",1e6],["kJ/kg","킬로줄/킬로그램",1e3],["BTU/lb","BTU/파운드",2326],["kcal/kg","킬로칼로리/킬로그램",4186.8]],
+  note:"제트연료의 저위발열량은 약 43 MJ/kg(≈ 18,500 BTU/lb)입니다."}
+};
+const $=id=>document.getElementById(id);
+let cat="thrust";
+function fmt(x){
+  if(!isFinite(x)) return "—";
+  if(x===0) return "0";
+  const a=Math.abs(x);
+  if(a>=1e9||a<1e-4) return x.toExponential(5).replace(/\.?0+e/,"e");
+  const p=Number(x.toPrecision(7));
+  return p.toLocaleString("ko-KR",{maximumFractionDigits:8});
+}
+function num(id){const v=parseFloat(String($(id).value).replace(/,/g,""));return isNaN(v)?NaN:v}
+function toK(v,u){return u==="K"?v:u==="°C"?v+273.15:u==="°F"?(v-32)*5/9+273.15:v*5/9}
+function fromK(k,u){return u==="K"?k:u==="°C"?k-273.15:u==="°F"?(k-273.15)*9/5+32:k*9/5}
+function buildCats(){
+  $("cats").innerHTML=Object.entries(CATS).map(([k,c])=>`<button class="chip${k===cat?" on":""}" data-c="${k}">${c.name}</button>`).join("");
+  $("from").innerHTML=CATS[cat].units.map((u,i)=>`<option value="${i}">${u[0]} · ${u[1]}</option>`).join("");
+  $("catnote").textContent=CATS[cat].note;
+}
+function conv(){
+  const c=CATS[cat], v=num("val"), fi=+$("from").value;
+  const rows=c.units.map((u,i)=>{
+    let r; if(c.temp){r=fromK(toK(v,c.units[fi][0]),u[0])}else{r=v*c.units[fi][2]/u[2]}
+    return `<div class="item${i===fi?" src":""}"><div class="u"><b>${u[0]}</b>${u[1]}</div><div class="v">${fmt(r)}</div><button class="copy" data-v="${fmt(r)}">복사</button></div>`;
+  });
+  $("out").innerHTML=rows.join("");
+}
+$("cats").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;cat=b.dataset.c;buildCats();conv();save()});
+$("val").addEventListener("input",conv);$("from").addEventListener("change",conv);
+document.addEventListener("click",async e=>{
+  const b=e.target.closest(".copy");if(!b)return;
+  try{await navigator.clipboard.writeText(b.dataset.v.replace(/,/g,""));b.textContent="복사됨";b.classList.add("ok");setTimeout(()=>{b.textContent="복사";b.classList.remove("ok")},1200)}catch(_){b.textContent="선택해 복사"}
+});
+// ISA
+const R=287.05287, GAM=1.4;
+function isa(h){ // geopotential m
+  let T,p;
+  if(h<=11000){T=288.15-0.0065*h;p=101325*Math.pow(T/288.15,G0/(0.0065*R))}
+  else if(h<=20000){T=216.65;p=22632.06*Math.exp(-G0*(h-11000)/(R*T))}
+  else{const h2=Math.min(h,32000);T=216.65+0.001*(h2-20000);p=5474.889*Math.pow(T/216.65,-G0/(0.001*R))}
+  return {T,p};
+}
+let altU="ft", lastA=340;
+function runISA(){
+  let a=num("alt"); const dT=num("dt")||0;
+  const hm=altU==="m"?a:altU==="ft"?a*FT:a*100*FT;
+  if(isNaN(hm)){$("isaout").innerHTML="";return}
+  const {T:Ts,p}=isa(Math.max(0,hm)); const T=Ts+dT; const rho=p/(R*T); const sp=Math.sqrt(GAM*R*T); lastA=sp;
+  const S=[["고도",fmt(hm)+" m",fmt(hm/FT)+" ft"],["기온",fmt(T-273.15)+" °C",fmt(T)+" K"],["기압",fmt(p/100)+" hPa",fmt(p/(LBF/0.0254**2))+" psi"],["밀도",fmt(rho)+" kg/m³","σ = "+fmt(rho/1.225)],["음속",fmt(sp*3600/1852)+" kt",fmt(sp)+" m/s"],["압력비 δ",fmt(p/101325),"온도비 θ = "+fmt(T/288.15)]];
+  $("isaout").innerHTML=S.map(s=>`<div class="stat"><div class="k">${s[0]}</div><div class="n">${s[1]}</div><div class="s">${s[2]}</div></div>`).join("");
+  if(hm>32000) $("isaout").insertAdjacentHTML("beforeend",`<div class="stat"><div class="k">주의</div><div class="s">32 km 위는 계산 범위 밖이라 32 km 값으로 고정됩니다.</div></div>`);
+  runMach(lastMode);
+}
+let lastMode="mach";
+function runMach(mode){
+  lastMode=mode;
+  if(mode==="mach"){const M=num("mach"); if(!isNaN(M)) $("tas").value=fmt(M*lastA*3600/1852).replace(/,/g,"")}
+  else{const v=num("tas"); if(!isNaN(v)) $("mach").value=fmt(v*1852/3600/lastA)}
+  const M=num("mach"), v=M*lastA;
+  $("machout").innerHTML=isNaN(M)?"":[["TAS",fmt(v*3.6)+" km/h",fmt(v)+" m/s"],["TAS",fmt(v/0.44704)+" mph",fmt(v*3600/1852)+" kt"]].map(s=>`<div class="stat"><div class="k">${s[0]}</div><div class="n">${s[1]}</div><div class="s">${s[2]}</div></div>`).join("");
+}
+$("alt").addEventListener("input",runISA);$("dt").addEventListener("input",runISA);
+$("mach").addEventListener("input",()=>runMach("mach"));$("tas").addEventListener("input",()=>runMach("tas"));
+$("altu").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+  const old=altU, a=num("alt"); altU=b.dataset.u;
+  if(!isNaN(a)){const m=old==="m"?a:old==="ft"?a*FT:a*100*FT; $("alt").value=fmt(altU==="m"?m:altU==="ft"?m/FT:m/FT/100).replace(/,/g,"")}
+  [...$("altu").children].forEach(x=>x.classList.toggle("on",x===b)); runISA()});
+// engine
+const TU=CATS.tsfc.units;
+$("tsfcu").innerHTML=TU.map((u,i)=>`<option value="${i}"${i===3?" selected":""}>${u[0]}</option>`).join("");
+function runEng(){
+  const v=num("tsfc"), u=TU[+$("tsfcu").value]; const si=v*u[2]; // kg/(N·s)
+  const isp=1/(si*G0); const S=[["TSFC",fmt(si/TU[3][2])+" lb/(lbf·h)",fmt(si/1e-6)+" g/(kN·s)"],["TSFC",fmt(si/TU[5][2])+" kg/(daN·h)",fmt(si/1e-6)+" mg/(N·s)"],["비추력 Isp",fmt(isp)+" s","연료 기준"],["유효배기속도",fmt(isp*G0)+" m/s","= Isp × g₀"]];
+  $("engout").innerHTML=isNaN(v)?"":S.map(s=>`<div class="stat"><div class="k">${s[0]}</div><div class="n">${s[1]}</div><div class="s">${s[2]}</div></div>`).join("");
+  const F=num("thr"), m=num("wt"); const Fn=F*LBF;
+  $("twout").innerHTML=isNaN(F)?"":[["추력",fmt(Fn/1000)+" kN",fmt(Fn/G0)+" kgf"],["추력",fmt(Fn/G0/1000)+" tf",fmt(F)+" lbf"],["추력 대 중량비",isNaN(m)||m<=0?"—":fmt(Fn/(m*G0)),"무게 "+fmt(m)+" kg 기준"]].map(s=>`<div class="stat"><div class="k">${s[0]}</div><div class="n">${s[1]}</div><div class="s">${s[2]}</div></div>`).join("");
+}
+["tsfc","thr","wt"].forEach(i=>$(i).addEventListener("input",runEng));$("tsfcu").addEventListener("change",runEng);
+$("copylink").addEventListener("click",async e=>{const b=e.currentTarget;const url=location.hostname.endsWith("github.io")?location.origin+location.pathname:"https://claude.ai/artifact/S8fZ4Gc6N9SWYZiMz42YuH";
+  try{await navigator.clipboard.writeText(url);b.textContent="복사됨!"}catch(_){b.textContent=url}setTimeout(()=>b.textContent="링크 복사",1800)});
+// tabs + prefs
+function show(t){document.querySelectorAll("nav.tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===t));["conv","isa","eng"].forEach(x=>$("tab-"+x).classList.toggle("hide",x!==t));save(t)}
+document.querySelector("nav.tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(b)show(b.dataset.tab)});
+let tab="conv";
+function save(t){if(t)tab=t;try{localStorage.setItem("aeunit",JSON.stringify({cat,tab}))}catch(_){}}
+$("theme").addEventListener("click",()=>{const r=document.documentElement;const dark=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;r.dataset.theme=dark?"light":"dark";try{localStorage.setItem("aeunit-theme",r.dataset.theme)}catch(_){}});
+try{const s=JSON.parse(localStorage.getItem("aeunit")||"{}");if(s.cat&&CATS[s.cat])cat=s.cat;if(s.tab)tab=s.tab;const th=localStorage.getItem("aeunit-theme");if(th)document.documentElement.dataset.theme=th}catch(_){}
+buildCats();conv();runISA();runEng();show(tab);
+</script>
+</body>
+</html>
